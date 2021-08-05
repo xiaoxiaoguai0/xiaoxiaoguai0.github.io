@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 13.333333333333vw;
+            height: 100%;
+        }
+
+        body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+        }
+
+        .bg {
+            position: absolute;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            filter: blur(.5rem);
+        }
+
+        #zj {
+            position: relative;
+            height: 4.5rem;
+            width: 4.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        .tp {
+            height: 4rem;
+            width: 4rem;
+            border-radius: 50%;
+            position: absolute;
+            top: .2rem;
+            bottom: .2rem;
+            transition: all .1s linear;
+        }
+
+        .jp {
+            height: 4.5em;
+            width: 4.5rem;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            transition: all .1s linear;
+        }
+
+        .bf {
+            position: absolute;
+            height: 2rem;
+            width: 2rem;
+        }
+
+        #jd {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        #jd span {
+            font-size: .25rem;
+            color: #e5e5e5;
+        }
+
+        .jdt {
+            position: relative;
+            height: .1rem;
+            width: 5rem;
+            background-color: #e5e5e5;
+            border-radius: .05rem;
+            margin: 0 .2rem;
+        }
+
+        .jdt i {
+            position: absolute;
+            height: .1rem;
+            width: .1rem;
+            background: red;
+            border-radius: .05rem;
+        }
+
+        .jdt p {
+            position: absolute;
+            width: .2rem;
+            height: .2rem;
+            background: red;
+            top: -.05rem;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <img class="bg" src="111.jpg" alt="">
+    <div id="zj">
+        <img class="tp" src="111.jpg" alt="">
+        <img class="jp" src="https://s3.music.126.net/mobile-new/img/disc-plus.png?b700b62e1971b351dcb8b8ce1c9ceea3="
+            alt="">
+        <img class="bf" src="https://s3.music.126.net/mobile-new/img/play_btn_3x.png?4da7e135b7c089f3777ec5cdbbb3a8d8=">
+    </div>
+    <div id="jd">
+        <span class="dm">0.00</span>
+        <div class="jdt">
+            <i></i>
+            <p></p>
+        </div>
+        <span class="sc">0.00</span>
+    </div>
+    <audio src="七里香.mp3"></audio>
+    <script>
+        var deg = 0
+        var f = 0
+        var m = 0
+        var e
+        var zjObj = document.querySelector("#zj")
+        var bfObj = document.querySelector(".bf")
+        var jpObj = document.querySelector(".jp")
+        var tpObj = document.querySelector(".tp")
+        var jdtObj = document.querySelector(".jdt")
+        var scObj = document.querySelector(".sc")
+        var dmObj = document.querySelector(".dm")
+        var iObj = document.querySelector(".jdt i")
+        var pObj = document.querySelector(".jdt p")
+
+        bfObj.style.display = "block"
+        bfObj.style.zIndex = "10"
+        var audio = document.querySelector('audio')
+
+        var start = function () {
+            //点击事件
+            zjObj.onclick = function () {
+                //判断播放键的状态，可见时，点击后播放
+                if ((bfObj.style.display) == "block") {
+                    if (audio.paused) {
+                        audio.play();
+                    }
+
+                    t = setInterval(function () {
+                        //旋转
+                        deg += 1.8
+                        tpObj.style.transform = "rotate(" + deg + "deg)"
+                        jpObj.style.transform = "rotate(" + deg + "deg)"
+                        bfObj.style.display = "none"
+                        //进度
+                        m = parseInt(audio.currentTime) % 60
+                        f = parseInt(parseInt(audio.currentTime) / 60)
+                        if (m < 10) {
+                            dmObj.innerText = f + ".0" + m
+                        } else {
+                            dmObj.innerText = f + "." + m
+                        }
+                        //播放结束后
+                        //parseInt(audio.currentTime)==parseInt(audio.duration)
+                        if (audio.ended) {
+                            jpObj.style.transform = "rotate(0deg)"
+                            bfObj.style.display = "block"
+                            audio.currentTime = 0
+                            audio.pause()
+                            pObj.style.left = 0
+                            iObj.style.width = 0
+                            clearInterval(t)
+                        }
+                        //歌曲时长
+                        if ((parseInt(audio.duration) % 60) < 10) {
+                            scObj.innerText = parseInt(parseInt(audio.duration) / 60) + ".0" + (
+                                parseInt(audio.duration) % 60)
+                        } else {
+                            scObj.innerText = parseInt(parseInt(audio.duration) / 60) + "." + (parseInt(
+                                audio.duration) % 60)
+                        }
+                        pObj.style.left = parseInt(audio.currentTime) * (jdtObj.offsetWidth - pObj
+                            .offsetWidth) / parseInt(audio.duration) + "px"
+                        iObj.style.width = parseInt(audio.currentTime) * (jdtObj.offsetWidth - pObj
+                            .offsetWidth) / parseInt(audio.duration) + 5 + "px"
+
+
+
+                    }, 100)
+                } else {
+                    //播放键不可见时，点击后停止停止
+                    bfObj.style.display = "block"
+                    audio.pause();
+                    clearInterval(t)
+                }
+            }
+        }
+        //初次调用
+        start()
+        //移入播放键后，再调用，点击后再重返上面判断播放器的状态
+        bfObj.onmouseover = function () {
+            start()
+        }
+        //进度条按下移动
+        pObj.ontouchstart = function () {
+            document.ontouchmove = function (evt) {
+                e = evt || window.event
+                var left = e.touches[0].clientX- jdtObj.offsetLeft
+                if (left <= 0) left = 0
+                var maxLeft = jdtObj.offsetWidth - pObj.offsetWidth
+                if (left > maxLeft) left = maxLeft
+                pObj.style.left = left + "px"
+                iObj.style.width = left + 5 + "px"
+                //更新歌曲进度
+                audio.currentTime = left * parseInt(audio.duration) / (jdtObj.offsetWidth - pObj.offsetWidth)
+            }
+            // pObj.ontouchstart = function () {
+            //     document.ontouchmove = null
+            // }
+        }
+        //进度条点击
+        jdtObj.onclick = function (evt) {
+            var jdtE = evt || window.event
+            pObj.style.left = (jdtE.clientX - jdtObj.offsetLeft) + "px"
+            iObj.style.width = (jdtE.clientX - jdtObj.offsetLeft) + 5 + "px"
+            audio.currentTime = (jdtE.clientX - jdtObj.offsetLeft) * parseInt(audio.duration) / (jdtObj
+                .offsetWidth - pObj.offsetWidth)
+        }
+    </script>
+</body>
+
+</html>
